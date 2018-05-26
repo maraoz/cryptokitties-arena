@@ -5,6 +5,7 @@
   "main": "truffle-config.js",
   "dependencies": {
     "openzeppelin-zos": "^1.9.1",
+    "truffle": "^4.1.11",
     "truffle-hdwallet-provider": "^0.0.5"
   },
   "devDependencies": {},
