@@ -22,20 +22,16 @@ contract CatDestinity is Destiny {
     }
 
     mapping (uint8 => Weight[32]) private matrix;
-
-    bytes32 private entropy;
     
-    function fight(bytes32 cat1, bytes32 cat2, bytes32 _entropy) public returns (bytes32 winner) {
-        entropy = _entropy;
-
+    function fight(bytes32 cat1, bytes32 cat2, bytes32 seed) public returns (bytes32 winner) {
         int256 life1 = getLife(cat1);
         int256 life2 = getLife(cat2);
 
-        int256 attack1 = getAttack(cat1) * getMult(cat1);
-        int256 attack2 = getAttack(cat2) * getMult(cat2);
+        int256 attack1 = getAttack(cat1, seed, 1) * getMult(cat1, seed, 2);
+        int256 attack2 = getAttack(cat2, seed, 3) * getMult(cat2, seed, 4);
 
-        int256 defense1 = getDefense(cat1);
-        int256 defense2 = getDefense(cat2);
+        int256 defense1 = getDefense(cat1, seed, 5);
+        int256 defense2 = getDefense(cat2, seed, 6);
         
         life1 -= (attack2 - (defense1 * 3) / 2);
         life2 -= (attack1 - (defense2 * 3) / 2);
@@ -196,33 +192,32 @@ contract CatDestinity is Destiny {
         matrix[32][19] = Weight({attack:255,defense:0,life:0}); // ruhroh 62
     }
     
-    function urandom() private returns (bytes32) {
-        entropy = keccak256(uint256(entropy) + 1);
-        return entropy;
+    function urandom(bytes32 seed, uint256 nonce) private returns (bytes32) {
+        return keccak256(uint256(seed) + nonce);
     }
 
     function getLife(bytes32 cat) public view returns (int256 life) {
         life = readValue(cat, gen_body).life * 10000;
     }
     
-    function getDefense(bytes32 cat) public view returns (int256 defense) {
+    function getDefense(bytes32 cat, bytes32 seed, uint256 nonce) public view returns (int256 defense) {
         defense += readValue(cat, gen_pattern).defense;
         defense += readValue(cat, gen_body_color).defense;
         defense += readValue(cat, gen_color).defense;
         defense += readValue(cat, gen_wild).defense;
-        defense += uint8(urandom()) / 2;
+        defense += uint8(urandom(seed, nonce)) / 2;
     }
     
-    function getAttack(bytes32 cat) public view returns (int256 attack) {
+    function getAttack(bytes32 cat, bytes32 seed, uint256 nonce) public view returns (int256 attack) {
         attack += readValue(cat, gen_body).attack;
         attack += readValue(cat, gen_eye_color).attack;
         attack += readValue(cat, gen_pattern).attack;
         attack += readValue(cat, gen_wild).attack;
         attack += readValue(cat, gen_mouth).attack;
-        attack += uint8(urandom()) / 2;
+        attack += uint8(urandom(seed, nonce)) / 2;
     }
     
-    function getMult(bytes32 cat) internal view returns (int256) {
-        return (uint8(urandom()) == uint8(keccak256(cat))) ? 2 : 1;
+    function getMult(bytes32 cat, bytes32 seed, uint256 nonce) internal view returns (int256) {
+        return (uint8(urandom(seed, nonce)) == uint8(keccak256(cat))) ? 2 : 1;
     }
 }
