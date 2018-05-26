@@ -1,5 +1,6 @@
 pragma solidity 0.4.24;
 
+import "./interfaces/Destiny.sol";
 import "./lib/KittyInterface.sol";
 import "./Random.sol";
 
@@ -17,14 +18,16 @@ contract KittyArena is Random {
 	}
 
 	KittyInterface ck;
+	Destiny destiny;
 	Game[] games;
 
 	event KittyPledge(uint256 indexed gameId, uint256 indexed kittyId, address indexed owner);
 	event StartFight(uint256 indexed gameId, uint256 fightBlock);
 	event SolvedFight(uint256 indexed gameId, address indexed winner);
 
-	constructor (KittyInterface _ck) public {
+	constructor (KittyInterface _ck, Destiny _destiny) public {
 		ck = _ck;
+		destiny = _destiny;
 	}
 
 	function pledge(uint256 kitty) {
@@ -65,19 +68,24 @@ contract KittyArena is Random {
 		emit SolvedFight(gameId, game.winner);
 	}
 
+	function catGenes(uint256 kitty) private view returns (bytes32 genes) {
+		var (,,,,,,,,,_genes) = ck.getKitty(kitty);
+		genes = bytes32(_genes);
+	}
+
 	function getWinner(uint256 gameId) public view returns (address) {
 		Game storage game = games[gameId];
 		if (game.winner != address(0)) {
 			return game.winner;
 		}
 
-		var (,,,,,,,,,genes1) = ck.getKitty(game.player1.kitty);
-		var (,,,,,,,,,genes2) = ck.getKitty(game.player2.kitty);
+		bytes32 genes1 = catGenes(game.player1.kitty);
+		bytes32 genes2 = catGenes(game.player2.kitty);
 
-		uint256 seed = maxRandom(game.fightBlock);
-		uint256 result = uint256(keccak256(seed, genes1, genes2));
+		bytes32 seed = bytes32(maxRandom(game.fightBlock));
+		bytes32 winner = destiny.fight(genes1, genes2, seed);
 
 		// TODO: Genes
-		return result % 2 == 0 ? game.player1.addr : game.player2.addr;
+		return winner == genes1 ? game.player1.addr : game.player2.addr;
 	}
 }
