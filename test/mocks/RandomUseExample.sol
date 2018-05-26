@@ -7,7 +7,7 @@ contract RandomUseExample {
 
   uint256 public d6 = 1;
 
-  function RandomUseExample(Random _r) {
+  function RandomUseExample(Random _r) public {
     r = _r;
   }
 

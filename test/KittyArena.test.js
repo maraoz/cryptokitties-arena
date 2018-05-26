@@ -1,7 +1,10 @@
 'use strict';
 
+const EVMRevert = require('./helpers/EVMRevert');
+
 require('chai')
   .use(require('chai-bignumber')(web3.BigNumber))
+  .use(require('chai-as-promised'))
   .should();
 
 const KittyArena = artifacts.require('KittyArena')
@@ -70,6 +73,39 @@ contract('KittyArena', function ([_, p1, p2, p3]) {
   })
 
   describe('resolve mechanic', function() {
+
+    it('cant resolve a game with one kitty', async function() {
+      // first player approve and enter
+      await this.ck.approve(this.arena.address, kitty1, {from: p1})
+      await this.arena.enter(kitty1, {from: p1})
+
+      // second player approve and enter
+      //await this.ck.approve(this.arena.address, kitty2, {from: p2})
+      //await this.arena.enter(kitty2, {from: p2})
+      
+      const gameId = 0
+      await this.arena.resolve(gameId).should.be.rejectedWith(EVMRevert)
+    })
+
+    it('can resolve a game with two kitties', async function() {
+      // first player approve and enter
+      await this.ck.approve(this.arena.address, kitty1, {from: p1})
+      await this.arena.enter(kitty1, {from: p1})
+
+      // second player approve and enter
+      await this.ck.approve(this.arena.address, kitty2, {from: p2})
+      await this.arena.enter(kitty2, {from: p2})
+      return
+      
+      const gameId = 0
+      const tx = await this.arena.resolve(gameId)
+
+      tx.logs.length.should.equal(1)
+      tx.logs[0].event.should.equal('FightResolved')
+      tx.logs[0].args.gameId.should.bignumber.equal(gameId)
+      tx.logs[0].args.winner.should.equal(p1)
+
+    })
 
   })
 
