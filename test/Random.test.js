@@ -10,6 +10,7 @@ contract('Random', function () {
   });
 
   it('can generate random numbers', async function() {
+    console.log('rolling 4 6-sided die...')
     await this.dice.roll()
     var d6 = await this.dice.d6()
     console.log(d6/1)

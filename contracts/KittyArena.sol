@@ -17,20 +17,20 @@ contract KittyArena is Random {
 		address winner;
 	}
 
-	KittyInterface ck;
+	KittyInterface public ck;
 	Destiny destiny;
-	Game[] games;
+	Game[] public games;
 
-	event KittyPledge(uint256 indexed gameId, uint256 indexed kittyId, address indexed owner);
-	event StartFight(uint256 indexed gameId, uint256 fightBlock);
-	event SolvedFight(uint256 indexed gameId, address indexed winner);
+	event KittyEntered(uint256 indexed gameId, uint256 indexed kittyId, address indexed owner);
+	event FightStarted(uint256 indexed gameId, uint256 fightBlock);
+	event FightResolved(uint256 indexed gameId, address indexed winner);
 
 	constructor (KittyInterface _ck, Destiny _destiny) public {
 		ck = _ck;
 		destiny = _destiny;
 	}
 
-	function pledge(uint256 kitty) {
+	function enter(uint256 kitty) {
 		ck.transferFrom(msg.sender, this, kitty);
 		Player storage player;
 		Game storage game;
@@ -43,7 +43,7 @@ contract KittyArena is Random {
 
 			player = game.player2;
 
-			emit StartFight(games.length - 1, game.fightBlock);
+			emit FightStarted(games.length - 1, game.fightBlock);
 		} else {
 			games.length += 1;
 			game = games[games.length - 1];
@@ -52,10 +52,10 @@ contract KittyArena is Random {
 			player = game.player1;
 		}
 
-		emit KittyPledge(games.length - 1, player.kitty, player.addr);
+		emit KittyEntered(games.length - 1, player.kitty, player.addr);
 	}
 
-	function solve(uint256 gameId) {
+	function resolve(uint256 gameId) {
 		Game storage game = games[gameId];
 		require(game.winner == address(0));
 
@@ -64,7 +64,7 @@ contract KittyArena is Random {
 		ck.transfer(game.winner, game.player1.kitty);
 		ck.transfer(game.winner, game.player2.kitty);
 
-		emit SolvedFight(gameId, game.winner);
+		emit FightResolved(gameId, game.winner);
 	}
 
 	function catGenes(uint256 kitty) private view returns (bytes32 genes) {
