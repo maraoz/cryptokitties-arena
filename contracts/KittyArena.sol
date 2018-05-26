@@ -29,11 +29,10 @@ contract KittyArena is Random {
 
 	function pledge(uint256 kitty) {
 		ck.transferFrom(msg.sender, this, kitty);
-
 		Player storage player;
 		Game storage game;
 
-		if (games[games.length - 1].fightBlock == 0) {
+		if (games.length > 0 && games[games.length - 1].fightBlock == 0) {
 			// player is player2 for game
 			game = games[games.length - 1];
 			game.player2 = Player(kitty, msg.sender);

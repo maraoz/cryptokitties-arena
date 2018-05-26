@@ -12,16 +12,16 @@ contract('Random', function () {
   it('can generate random numbers', async function() {
     await this.dice.roll()
     var d6 = await this.dice.d6()
-    console.log(d6)
+    console.log(d6/1)
     await this.dice.roll()
     d6 = await this.dice.d6()
-    console.log(d6)
+    console.log(d6/1)
     await this.dice.roll()
     d6 = await this.dice.d6()
-    console.log(d6)
+    console.log(d6/1)
     await this.dice.roll()
     d6 = await this.dice.d6()
-    console.log(d6)
+    console.log(d6/1)
   })
 
 });
