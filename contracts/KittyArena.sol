@@ -21,6 +21,8 @@ contract KittyArena is Random {
 	Destiny destiny;
 	Game[] public games;
 
+	address constant TIE = address(-2);
+
 	event KittyEntered(uint256 indexed gameId, uint256 indexed kittyId, address indexed owner);
 	event FightStarted(uint256 indexed gameId, uint256 fightBlock);
 	event FightResolved(uint256 indexed gameId, address indexed winner);
@@ -30,7 +32,7 @@ contract KittyArena is Random {
 		destiny = _destiny;
 	}
 
-	function enter(uint256 kitty) {
+	function enter(uint256 kitty) external {
 		ck.transferFrom(msg.sender, this, kitty);
 		Player storage player;
 		Game storage game;
@@ -55,21 +57,16 @@ contract KittyArena is Random {
 		emit KittyEntered(games.length - 1, player.kitty, player.addr);
 	}
 
-	function resolve(uint256 gameId) {
+	function resolve(uint256 gameId) external {
 		Game storage game = games[gameId];
 		require(game.winner == address(0));
 
 		game.winner = getWinner(gameId);
 		
-		ck.transfer(game.winner, game.player1.kitty);
-		ck.transfer(game.winner, game.player2.kitty);
+		ck.transfer(game.winner == TIE ? game.player1.addr : game.winner, game.player1.kitty);
+		ck.transfer(game.winner == TIE ? game.player2.addr : game.winner, game.player2.kitty);
 
 		emit FightResolved(gameId, game.winner);
-	}
-
-	function catGenes(uint256 kitty) private view returns (bytes32 genes) {
-		var (,,,,,,,,,_genes) = ck.getKitty(kitty);
-		genes = bytes32(_genes);
 	}
 
 	function getWinner(uint256 gameId) public view returns (address) {
@@ -81,10 +78,32 @@ contract KittyArena is Random {
 		bytes32 genes1 = catGenes(game.player1.kitty);
 		bytes32 genes2 = catGenes(game.player2.kitty);
 
+		require(block.number > game.fightBlock);
 		bytes32 seed = bytes32(maxRandom(game.fightBlock));
-		bytes32 winner = destiny.fight(genes1, genes2, seed);
+		
+		// If game isn't resolved in 256 blocks and we cannot get the entropy,
+		// we considered it tie
+		if (seed == bytes32(0)) {
+			return TIE;
+		}
 
-		// TODO: Genes
-		return winner == genes1 ? game.player1.addr : game.player2.addr;
+		bytes32 winnerGenes = destiny.fight(genes1, genes2, seed);
+
+		if (winnerGenes == genes1) {
+			return game.player1.addr;
+		} 
+
+		if (winnerGenes == genes2) { 
+			return game.player2.addr;
+		}
+
+		// Destiny may return something other than one of the two cats gens,
+		// if so we consider it a tie
+		return TIE;
+	}
+
+	function catGenes(uint256 kitty) private view returns (bytes32 genes) {
+		var (,,,,,,,,,_genes) = ck.getKitty(kitty);
+		genes = bytes32(_genes);
 	}
 }

@@ -13,10 +13,13 @@ contract Random {
       return uint256((n & mask) >> offset);
   }
 
+  /**
+  * @dev This function assumes that the consumer contract has logic for handling when
+  the returned blockhash is bytes32(0), 
+  */
   function maxRandom(uint256 sourceBlock) public view returns (uint256 randomNumber) {
-    require(block.number != sourceBlock && block.number - 256 >= sourceBlock);
-    randomNumber = uint256(block.blockhash(sourceBlock));
-    assert(randomNumber > 0);
+    require(block.number > sourceBlock);
+    return uint256(block.blockhash(sourceBlock));
   }
 
   function random(uint256 upper) public view returns (uint256 randomNumber) {
