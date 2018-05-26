@@ -13,15 +13,18 @@ const MockDestiny = artifacts.require('MockDestiny')
 
 contract('KittyArena', function ([_, p1, p2, p3]) {
 
-  beforeEach(async function () {
-    this.ck = await MockKittyCore.new()
-    this.destiny = await MockDestiny.new()
-    this.arena = await KittyArena.new(this.ck.address, this.destiny.address)
-  })
-
   const kitty1 = 42
   const kitty2 = 69
   const kitty3 = 1337
+
+  beforeEach(async function () {
+    this.ck = await MockKittyCore.new()
+    await this.ck.mint(p1, kitty1);
+    await this.ck.mint(p2, kitty2);
+    await this.ck.mint(p3, kitty3);
+    this.destiny = await MockDestiny.new()
+    this.arena = await KittyArena.new(this.ck.address, this.destiny.address)
+  })
 
   describe('enter mechanic', function() {
     it('first kitty can enter', async function() {
