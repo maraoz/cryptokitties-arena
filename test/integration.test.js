@@ -11,8 +11,8 @@ const CatDestiny = artifacts.require('CatDestiny')
 
 contract('KittyArena integration with real CatDestiny', function ([_, p1, p2]) {
 
-  const kitty1 = 43
-  const kitty2 = 70
+  const kitty1 = 44
+  const kitty2 = 71
 
   beforeEach(async function () {
     this.ck = await MockKittyCore.new()
@@ -35,7 +35,6 @@ contract('KittyArena integration with real CatDestiny', function ([_, p1, p2]) {
     const gameId = 0
     const tx = await this.arena.resolve(gameId)
 
-    console.log(p1, p2)
     tx.logs.length.should.equal(1)
     tx.logs[0].event.should.equal('FightResolved')
     tx.logs[0].args.gameId.should.bignumber.equal(gameId)
