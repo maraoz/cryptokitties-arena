@@ -6,12 +6,14 @@ require('chai')
 
 const KittyArena = artifacts.require('KittyArena')
 const MockKittyCore = artifacts.require('MockKittyCore')
+const MockDestiny = artifacts.require('MockDestiny')
 
 contract('KittyArena', function ([_, p1, p2]) {
 
   beforeEach(async function () {
     this.ck = await MockKittyCore.new()
-    this.arena = await KittyArena.new(this.ck.address)
+    this.destiny = await MockDestiny.new()
+    this.arena = await KittyArena.new(this.ck.address, this.destiny.address)
   })
 
   const kitty1 = 42;
