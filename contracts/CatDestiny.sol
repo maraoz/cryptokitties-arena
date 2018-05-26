@@ -58,7 +58,7 @@ contract CatDestiny is Destiny {
         }
     }
     
-    function gen(bytes32 dna, uint256 p) public pure returns (uint8) {
+    function gen(bytes32 dna, uint256 p) private pure returns (uint8) {
         return uint8(bytes1((dna << (248 - (p * 5)))) & 0x1f);
     }
     
@@ -196,11 +196,11 @@ contract CatDestiny is Destiny {
         return keccak256(uint256(seed) + nonce);
     }
 
-    function getLife(bytes32 cat) public view returns (int256 life) {
-        life = readValue(cat, gen_body).life * 10000;
+    function getLife(bytes32 cat) private returns (int256 life) {
+        life = readValue(cat, gen_body).life * 4;
     }
     
-    function getDefense(bytes32 cat, bytes32 seed, uint256 nonce) public view returns (int256 defense) {
+    function getDefense(bytes32 cat, bytes32 seed, uint256 nonce) private returns (int256 defense) {
         defense += readValue(cat, gen_pattern).defense;
         defense += readValue(cat, gen_body_color).defense;
         defense += readValue(cat, gen_color).defense;
@@ -208,7 +208,7 @@ contract CatDestiny is Destiny {
         defense += uint8(urandom(seed, nonce)) / 2;
     }
     
-    function getAttack(bytes32 cat, bytes32 seed, uint256 nonce) public view returns (int256 attack) {
+    function getAttack(bytes32 cat, bytes32 seed, uint256 nonce) private returns (int256 attack) {
         attack += readValue(cat, gen_body).attack;
         attack += readValue(cat, gen_eye_color).attack;
         attack += readValue(cat, gen_pattern).attack;
