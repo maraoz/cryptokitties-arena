@@ -60,6 +60,8 @@ contract KittyArena is Random {
 	function resolve(uint256 gameId) external {
 		Game storage game = games[gameId];
 		require(game.winner == address(0));
+        require(game.player1.addr != address(0));
+        require(game.player2.addr != address(0));
 
 		game.winner = getWinner(gameId);
 		

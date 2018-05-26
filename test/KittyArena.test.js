@@ -1,7 +1,10 @@
 'use strict';
 
+const EVMRevert = require('./helpers/EVMRevert');
+
 require('chai')
   .use(require('chai-bignumber')(web3.BigNumber))
+  .use(require('chai-as-promised'))
   .should();
 
 const KittyArena = artifacts.require('KittyArena')
@@ -10,15 +13,18 @@ const MockDestiny = artifacts.require('MockDestiny')
 
 contract('KittyArena', function ([_, p1, p2, p3]) {
 
-  beforeEach(async function () {
-    this.ck = await MockKittyCore.new()
-    this.destiny = await MockDestiny.new()
-    this.arena = await KittyArena.new(this.ck.address, this.destiny.address)
-  })
-
   const kitty1 = 42
   const kitty2 = 69
   const kitty3 = 1337
+
+  beforeEach(async function () {
+    this.ck = await MockKittyCore.new()
+    await this.ck.mint(p1, kitty1);
+    await this.ck.mint(p2, kitty2);
+    await this.ck.mint(p3, kitty3);
+    this.destiny = await MockDestiny.new()
+    this.arena = await KittyArena.new(this.ck.address, this.destiny.address)
+  })
 
   describe('enter mechanic', function() {
     it('first kitty can enter', async function() {
@@ -70,6 +76,39 @@ contract('KittyArena', function ([_, p1, p2, p3]) {
   })
 
   describe('resolve mechanic', function() {
+
+    it('cant resolve a game with one kitty', async function() {
+      // first player approve and enter
+      await this.ck.approve(this.arena.address, kitty1, {from: p1})
+      await this.arena.enter(kitty1, {from: p1})
+
+      // second player approve and enter
+      //await this.ck.approve(this.arena.address, kitty2, {from: p2})
+      //await this.arena.enter(kitty2, {from: p2})
+      
+      const gameId = 0
+      await this.arena.resolve(gameId).should.be.rejectedWith(EVMRevert)
+    })
+
+    it('can resolve a game with two kitties', async function() {
+      // first player approve and enter
+      await this.ck.approve(this.arena.address, kitty1, {from: p1})
+      await this.arena.enter(kitty1, {from: p1})
+
+      // second player approve and enter
+      await this.ck.approve(this.arena.address, kitty2, {from: p2})
+      await this.arena.enter(kitty2, {from: p2})
+      return
+      
+      const gameId = 0
+      const tx = await this.arena.resolve(gameId)
+
+      tx.logs.length.should.equal(1)
+      tx.logs[0].event.should.equal('FightResolved')
+      tx.logs[0].args.gameId.should.bignumber.equal(gameId)
+      tx.logs[0].args.winner.should.equal(p1)
+
+    })
 
   })
 
