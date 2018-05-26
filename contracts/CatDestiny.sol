@@ -2,7 +2,7 @@ pragma solidity ^0.4.22;
 
 import "./interfaces/Destiny.sol";
 
-contract CatDestinity is Destiny {
+contract CatDestiny is Destiny {
     uint8 private constant type_life = 0;
     uint8 private constant type_attack = 1;
     uint8 private constant type_defense = 2;
