@@ -9,8 +9,8 @@ require('chai')
 
 const KittyArena = artifacts.require('KittyArena')
 const MockKittyCore = artifacts.require('MockKittyCore')
-const CatDestiny = artifacts.require('CatDestiny')
-//const MockTieDestiny = artifacts.require('MockTieDestiny')
+const MockDestiny = artifacts.require('MockDestiny')
+const MockTiedDestiny = artifacts.require('MockTiedDestiny')
 
 contract('KittyArena', function ([_, p1, p2, p3]) {
 
@@ -23,7 +23,7 @@ contract('KittyArena', function ([_, p1, p2, p3]) {
     await this.ck.mint(p1, kitty1);
     await this.ck.mint(p2, kitty2);
     await this.ck.mint(p3, kitty3);
-    this.destiny = await CatDestiny.new()
+    this.destiny = await MockDestiny.new()
     this.arena = await KittyArena.new(this.ck.address, this.destiny.address)
   })
 
@@ -106,9 +106,10 @@ contract('KittyArena', function ([_, p1, p2, p3]) {
 
     })
 
-    it.skip('can resolve a game that ties', async function() {
-      const destiny = await MockTieDestiny.new()
+    it('can resolve a game that ties', async function() {
+      const destiny = await MockTiedDestiny.new()
       this.arena = await KittyArena.new(this.ck.address, destiny.address)
+      const TIE = await this.arena.TIE();
       // first player approve and enter
       await this.ck.approve(this.arena.address, kitty1, {from: p1})
       await this.arena.enter(kitty1, {from: p1})
@@ -122,9 +123,8 @@ contract('KittyArena', function ([_, p1, p2, p3]) {
 
       tx.logs.length.should.equal(1)
       tx.logs[0].event.should.equal('FightResolved')
-      console.log(tx)
-      //tx.logs[0].args.gameId.should.bignumber.equal(gameId)
-      //tx.logs[0].args.winner.should.equal(p1)
+      tx.logs[0].args.gameId.should.bignumber.equal(gameId)
+      tx.logs[0].args.winner.should.equal(TIE)
 
     })
 

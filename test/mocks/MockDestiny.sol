@@ -10,6 +10,6 @@ contract MockDestiny is Destiny {
 
 contract MockTiedDestiny is Destiny {
     function fight(bytes32 cat1, bytes32 cat2, bytes32 entropy) public returns (bytes32 winner) {
-      return 0;
+      return 123456; // anything different than cat1 and cat2 means tie
     }
 }

@@ -21,7 +21,7 @@ contract KittyArena is Random {
 	Destiny destiny;
 	Game[] public games;
 
-	address constant TIE = address(-2);
+	address constant public TIE = address(-2);
 
 	event KittyEntered(uint256 indexed gameId, uint256 indexed kittyId, address indexed owner);
 	event FightStarted(uint256 indexed gameId, uint256 fightBlock);
