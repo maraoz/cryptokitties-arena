@@ -12,7 +12,6 @@ contract RandomUseExample {
   }
 
   function roll() public {
-    d6 = r.random(6);
+    d6 = r.random(6**5);
   }
-
 }

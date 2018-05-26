@@ -4,8 +4,6 @@ pragma solidity ^0.4.18;
  * PRNG, source: https://github.com/axiomzen/eth-random
  */
 contract Random {
-  uint256 public _seed;
-
   // The upper bound of the number returns is 2^bits - 1
   function bitSlice(uint256 n, uint256 bits, uint256 slot) public pure returns(uint256) {
       uint256 offset = slot * bits;
@@ -15,19 +13,19 @@ contract Random {
       return uint256((n & mask) >> offset);
   }
 
-  function maxRandom() public returns (uint256 randomNumber) {
-    _seed = uint256(keccak256(
-        _seed,
-        block.blockhash(block.number - 1),
-        block.coinbase,
-        block.difficulty
-    ));
-    return _seed;
+  function maxRandom(uint256 sourceBlock) public view returns (uint256 randomNumber) {
+    require(block.number != sourceBlock && block.number - 256 >= sourceBlock);
+    randomNumber = uint256(block.blockhash(sourceBlock));
+    assert(randomNumber > 0);
+  }
+
+  function random(uint256 upper) public view returns (uint256 randomNumber) {
+    return random(upper, block.number - 1);
   }
 
   // return a pseudo random number between lower and upper bounds
   // given the number of previous blocks it should hash.
-  function random(uint256 upper) public returns (uint256 randomNumber) {
-    return maxRandom() % upper;
+  function random(uint256 upper, uint256 sourceBlock) public returns (uint256 randomNumber) {
+    return maxRandom(sourceBlock) % upper;
   }
 }
