@@ -48,7 +48,7 @@ function KittiesList(props) {
   );
   return (
     <div>
-      <h3 className="center-align">Your Kitties</h3>
+      <h3 className="center-align title-secondary">Select one of your kitties</h3>
       <ul>{listItems}</ul>
     </div>
   );
