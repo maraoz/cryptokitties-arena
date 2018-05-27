@@ -5,6 +5,8 @@ import 'materialize-css'; // It installs the JS asset only
 import 'materialize-css/dist/css/materialize.min.css';
 import 'animate.css';
 
+import logo from './assets/img/logo-crypto-kitties-fight.svg';
+
 import './index.css';
 import { debug } from 'util';
 
@@ -24,12 +26,11 @@ window.addEventListener('load', function() {
     var myWeb3 = new Web3(window.web3.currentProvider);
     myWeb3.eth.getAccounts(function (err, accounts) {
       myWeb3.eth.getBalance(accounts[0], function (err, balance) {
-        console.log('Your balance is ' + window.web3.fromWei(balance, 'ether'))   
+        console.log('Your balance is ' + window.web3.fromWei(balance, 'ether'))
       });
     });
   }
 })
-//web3.setProvider(new web3.providers.HttpProvider('https://ropsten.infura.io'));
 
 class Kitty extends React.Component {
   render() {
@@ -47,7 +48,7 @@ function KittiesList(props) {
   );
   return (
     <div>
-      <h2>Kitties</h2>
+      <h3 className="center-align ">Kitties</h3>
       <ul>{listItems}</ul>
     </div>
   );
@@ -57,7 +58,8 @@ class Kitties extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      'kitties': [{'id': 1}]
+      'kitties': [{'id': 1}],
+      'loading': true,
     }
     var that = this;
     window.addEventListener('load', function() {
@@ -65,9 +67,8 @@ class Kitties extends React.Component {
         var myWeb3 = new Web3(window.web3.currentProvider);
         myWeb3.eth.getAccounts(function (err, accounts) {
           getKitties(accounts[0], function(kitties) {
-            // that.setState({'kitties': [{'id': 2}]})
-            debugger
-            that.setState({'kitties': kitties});
+            console.log(kitties)
+            that.setState({'kitties': kitties, 'loading': false});
           });
         });
       }
@@ -80,24 +81,37 @@ class Kitties extends React.Component {
 
 class Arena extends React.Component {
   render() {
-    return (<h2>Arena</h2>)
+    return (<h3>Arena</h3>)
   }
 }
 
 class Game extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      titleClasses: 'title title-primary',
+    }
+    /*let that = this;
+    setTimeout(function(){
+      that.setState({titleClasses: 'animated fadeInUp'})
+    }, 1200)*/
   }
 
   render() {
   return (
     <div>
-    <h3 classnames="animated fadeInUp">Welcome to the Crypto Kitties Arena</h3>
-      <div className="container">
-          <div className="row">
-            <div className="col"><Kitties /></div>
-            <div className="col"><Arena /></div>
-          </div>
+      <div className="row">
+        <div className="col m3">
+          <img id="logo" src={logo} />
+        </div>
+        <div className="col m9 valign-wrapper">
+          <h2 className={this.state.titleClasses}>Crypto Kitties Arena</h2>
+        </div>
+      </div>
+      <hr className="blue-grey darken-3 hr-middle"/>
+      <div className="row">
+        <div className="col m4"><Kitties /></div>
+        <div className="col m8"><Arena /></div>
       </div>
     </div>
   );
@@ -108,23 +122,3 @@ ReactDOM.render(
   <Game />,
   document.getElementById('root')
 );
-/*
-let account = null;
-
-web3js.eth.getCoinbase(function(err, account) {
-  console.log(err, account)
-  if (err === null) {
-    account = account;
-    //$("#account").text(account);
-    /*web3.eth.getBalance(account, function(err, balance) {
-      if (err === null) {
-        $("#accountBalance").text(web3.fromWei(balance, "ether") + " ETH");
-      }
-    });
-  }
-});
-
-web3js.eth.getBalance(account, (err, balance) => {
-  console.log(web3js.fromWei(balance, "ether") + " ETH")
-});
-*/

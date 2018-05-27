@@ -1,9 +1,44 @@
+@import url('https://fonts.googleapis.com/css?family=Inconsolata');
+
 body, html {
 
 }
 
-h3 {
-  text-align: center;
-  color: #ffffff;
+#logo {
   margin-top: 40px;
+  margin-left: 40px;
+  margin-bottom: 40px;
+  max-width: 100px;
+}
+
+.title {
+  color: #ffffff;
+  margin-top: 20px;
+  font-size: 50px;
+}
+
+.title-primary {
+  width: 100%;
+  text-transform: uppercase;
+  font-family: 'Inconsolata', monospace;
+}
+
+.inline {
+  display: inline-block;
+}
+
+.primary-color {
+  background-color: #682AB4;
+}
+
+.hr-middle {
+  height: 2px;
+}
+
+h3 {
+  color: #ddd;
+}
+
+.vhiden {
+  visibility: hidden;
 }
