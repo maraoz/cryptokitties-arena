@@ -81,7 +81,7 @@ class Kitties extends React.Component {
 
 class Arena extends React.Component {
   render() {
-    return (<h3 className="center-align">Arena</h3>)
+    return (<h3 className="center-align title-secondary">Now fight on the Arena ⚔</h3>)
   }
 }
 
