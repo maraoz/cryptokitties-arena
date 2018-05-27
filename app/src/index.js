@@ -48,7 +48,7 @@ function KittiesList(props) {
   );
   return (
     <div>
-      <h3 className="center-align ">Kitties</h3>
+      <h3 className="center-align">Your Kitties</h3>
       <ul>{listItems}</ul>
     </div>
   );
@@ -81,7 +81,7 @@ class Kitties extends React.Component {
 
 class Arena extends React.Component {
   render() {
-    return (<h3>Arena</h3>)
+    return (<h3 className="center-align">Arena</h3>)
   }
 }
 
