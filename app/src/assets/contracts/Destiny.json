@@ -1,0 +1,1 @@
+[{"inputs": [{"type": "bytes32", "name": "cat1"}, {"type": "bytes32", "name": "cat2"}, {"type": "bytes32", "name": "entropy"}], "constant": false, "name": "fight", "outputs": [{"type": "bytes32", "name": "winner"}], "stateMutability": "nonpayable", "payable": false, "type": "function"}]
